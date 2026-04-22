@@ -50,7 +50,7 @@ public class Player : MonoBehaviour
             rigid.velocity = new Vector3(newSpeed, rigid.velocity.y, 0);
         }
         // Jump only when the player is on the ground
-        if (Input.GetKeyDown(KeyCode.W) && rigid.velocity.y == 0)
+        if (Input.GetKeyDown(KeyCode.W) && rigid.velocity.y <= 0.01 && rigid.velocity.y >= -0.01)
         {
             rigid.AddForce(Vector3.up * speed, ForceMode.Impulse);
         }
