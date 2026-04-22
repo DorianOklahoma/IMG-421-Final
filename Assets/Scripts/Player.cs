@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody))]
@@ -19,7 +20,7 @@ public class Player : MonoBehaviour
     private Rigidbody rigid;
     private WeaponController wc;
     private GameObject hitObject = null;
-    private Renderer[] lastHitRenderers;
+    private GameObject lastHitObject = null;
     private Vector3 direction = Vector3.zero;
 
     void Start()
@@ -55,12 +56,21 @@ public class Player : MonoBehaviour
         }
 
         /* Interaction Code */
-        highlightInteractable();
+        hitObject = GetInteractedObject();
+        setInteractedHighlight();
 
         if (Input.GetKeyDown(KeyCode.E) && hitObject != null)
         {
             interact();
         }
+
+        // Interaction debug ray
+        Debug.DrawRay(transform.position, direction * interactRadius, Color.green);
+    }
+    
+    public bool isFlipped()
+    {
+        return direction.x < 0;
     }
 
     private GameObject GetInteractedObject()
@@ -72,12 +82,11 @@ public class Player : MonoBehaviour
         foreach (var hit in hits)
         {
             GameObject obj = hit.collider.gameObject;
+            Object mainObject = obj.GetComponentInParent<Object>();
 
-            Weapon weapon = obj.GetComponentInParent<Weapon>();
-
-            if (weapon != null)
+            if (mainObject != null)
             {
-                obj = weapon.gameObject;
+                obj = mainObject.GameObject();
             }
 
             // Skip equipped weapon (including children)
@@ -88,75 +97,27 @@ public class Player : MonoBehaviour
             if (obj == gameObject)
                 continue;
 
-            if (isInteractable(obj))
+            if (obj.GetComponent<Object>() != null)
                 return obj;
         }
 
         return null;
     }
 
-    public bool isFlipped()
+    private void setInteractedHighlight()
     {
-        return direction.x < 0;
-    }
-
-    private void highlightInteractable()
-    {
-        hitObject = GetInteractedObject();
-
-        Renderer[] currentRenderers = null;
-
-        if (hitObject != null)
+        // If hit a different object (or nothing), remove previous highlight
+        if (lastHitObject != hitObject)
         {
-            currentRenderers = hitObject.GetComponentsInChildren<Renderer>();
-        }
-
-        // If different object (or nothing), remove previous highlight
-        if (lastHitRenderers != currentRenderers)
-        {
-            if (lastHitRenderers != null)
+            if (lastHitObject != null)
             {
-                foreach (Renderer rend in lastHitRenderers)
-                {
-                    if (rend != null)
-                    {
-                        rend.material.SetColor("_EmissionColor", Color.black);
-                    }
-                }
+                lastHitObject.GetComponent<Object>().resetHighlight();
             }
-
-            // Apply highlight to new object (all renderers)
-            if (hitObject != null && isInteractable(hitObject) && currentRenderers != null)
-            {
-                foreach (Renderer rend in currentRenderers)
-                {
-                    rend.material.EnableKeyword("_EMISSION");
-                    rend.material.SetColor("_EmissionColor", Color.yellow * 2f);
-                }
+            if (hitObject != null){
+                hitObject.GetComponent<Object>().highlight();
             }
-
-            lastHitRenderers = currentRenderers;
+            lastHitObject = hitObject;
         }
-
-        // If nothing hit, clear highlight
-        if (currentRenderers == null && lastHitRenderers != null)
-        {
-            foreach (Renderer rend in lastHitRenderers)
-            {
-                if (rend != null)
-                {
-                    rend.material.SetColor("_EmissionColor", Color.black);
-                }
-            }
-
-            lastHitRenderers = null;
-        }
-
-        // Debug ray
-        Vector3 direction = (Camera.main.ScreenToWorldPoint(Input.mousePosition)
-                            - transform.position + new Vector3(0, 0, 10)).normalized;
-
-        Debug.DrawRay(transform.position, direction * interactRadius, Color.green);
     }
 
     private void interact()
@@ -165,16 +126,6 @@ public class Player : MonoBehaviour
         {
             wc.EquipWeapon(hitObject.GetComponent<Weapon>());
         }
-    }
-
-    private bool isInteractable(GameObject obj)
-    {
-        if (obj == null) return false;
-        if (obj.GetComponent<Weapon>() != null)
-        {
-            return true;
-        }
-        return false;
     }
 
     public void TakeDamage(int damage = 0)

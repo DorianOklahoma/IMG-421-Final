@@ -5,6 +5,7 @@ using UnityEngine;
 
 public abstract class Weapon : MonoBehaviour
 {
+    [Header("Static Weapon Settings")]
     public string weaponName = "Weapon Name";
     public float primaryDamage = 1.0f;
     public float secondaryDamage = 1.0f;
