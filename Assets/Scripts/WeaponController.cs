@@ -9,6 +9,13 @@ public class WeaponController : MonoBehaviour
     public Weapon weapon;
     public Weapon defaultWeapon;
     public Transform weaponPoint;
+    
+    private Player player;
+    void Start()
+    {
+        player = GetComponent<Player>();
+    }
+
     void Update()
     {
         // If the player doesn't have a weapon equipped, equip the default weapon
@@ -44,6 +51,16 @@ public class WeaponController : MonoBehaviour
             {
                 dropWeapon();
             }
+        }
+
+        // Flip weapon if facing left
+        if (player.isFlipped())
+        {
+            weaponPoint.localPosition = new Vector3(Mathf.Abs(weaponPoint.localPosition.x) * -1, weaponPoint.localPosition.y, 0);
+        }
+        else
+        {
+            weaponPoint.localPosition = new Vector3(Mathf.Abs(weaponPoint.localPosition.x), weaponPoint.localPosition.y, 0);
         }
     }
 
