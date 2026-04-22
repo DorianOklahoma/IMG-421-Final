@@ -62,38 +62,42 @@ public abstract class Weapon : MonoBehaviour
         }
     }
 
-    // Drop weapon method
     public virtual void onDropWeapon()
     {
-        // Detach weapon from player and enable physics
+        // Detach weapon from player
         transform.SetParent(null);
-        Rigidbody rb = GetComponent<Rigidbody>();
-        Collider col = GetComponent<Collider>();
-        if (rb != null)
+
+        Rigidbody[] rigidbodies = GetComponentsInChildren<Rigidbody>(true);
+        Collider[] colliders = GetComponentsInChildren<Collider>(true);
+
+        foreach (Rigidbody rb in rigidbodies)
         {
             rb.isKinematic = false;
         }
-        if (col != null)
+
+        foreach (Collider col in colliders)
         {
             col.enabled = true;
         }
+
         Debug.Log($"Dropped {weaponName}");
     }
 
-    // Equip weapon method
     public virtual void onEquip()
     {
-        Rigidbody rb = GetComponent<Rigidbody>();
-        Collider col = GetComponent<Collider>();
-        
-        if (rb != null)
+        Rigidbody[] rigidbodies = GetComponentsInChildren<Rigidbody>(true);
+        Collider[] colliders = GetComponentsInChildren<Collider>(true);
+
+        foreach (Rigidbody rb in rigidbodies)
         {
             rb.isKinematic = true;
         }
-        if (col != null)
+
+        foreach (Collider col in colliders)
         {
             col.enabled = false;
         }
+
         Debug.Log($"Equipped {weaponName}");
     }
 
