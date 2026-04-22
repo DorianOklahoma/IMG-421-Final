@@ -53,14 +53,24 @@ public class WeaponController : MonoBehaviour
             }
         }
 
-        // Flip weapon if facing left
-        if (player.isFlipped())
+        if (weapon != null)
         {
-            weaponPoint.localPosition = new Vector3(Mathf.Abs(weaponPoint.localPosition.x) * -1, weaponPoint.localPosition.y, 0);
-        }
-        else
-        {
-            weaponPoint.localPosition = new Vector3(Mathf.Abs(weaponPoint.localPosition.x), weaponPoint.localPosition.y, 0);
+            // Flip weapon if facing left
+            if (player.isFlipped())
+            {
+                // Switch weaponPoint to other side
+                weaponPoint.localPosition = new Vector3(Mathf.Abs(weaponPoint.localPosition.x) * -1, weaponPoint.localPosition.y, 0);
+
+                // Rotate the point 180 degrees
+                weaponPoint.localRotation = new Quaternion(weapon.transform.localRotation.x, 180, weapon.transform.localRotation.z, weapon.transform.localRotation.w);
+            }
+            else
+            {
+                // Switch position back
+                weaponPoint.localPosition = new Vector3(Mathf.Abs(weaponPoint.localPosition.x), weaponPoint.localPosition.y, 0);
+                // switch rotation back
+                weaponPoint.localRotation = new Quaternion(weapon.transform.localRotation.x, 0, weapon.transform.localRotation.z, weapon.transform.localRotation.w);
+            }
         }
     }
 
