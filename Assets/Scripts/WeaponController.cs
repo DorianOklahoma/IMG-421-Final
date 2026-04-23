@@ -49,14 +49,14 @@ public class WeaponController : MonoBehaviour
             }
             if (Input.GetKeyDown(KeyCode.Q))
             {
-                dropWeapon();
+                DropWeapon();
             }
         }
 
         if (weapon != null)
         {
             // Flip weapon if facing left
-            if (player.isFlipped())
+            if (player.IsFlipped())
             {
                 // Switch weaponPoint to other side
                 weaponPoint.localPosition = new Vector3(Mathf.Abs(weaponPoint.localPosition.x) * -1, weaponPoint.localPosition.y, 0);
@@ -86,7 +86,7 @@ public class WeaponController : MonoBehaviour
             }
             else
             {
-                dropWeapon();
+                DropWeapon();
             }
         }
         // equip new weapon
@@ -95,10 +95,10 @@ public class WeaponController : MonoBehaviour
         weapon.transform.SetParent(weaponPoint);
         weapon.transform.localPosition = Vector3.zero;
         weapon.transform.localRotation = Quaternion.identity;
-        weapon.onEquip();
+        weapon.OnEquip();
     }
 
-    public void dropWeapon()
+    public void DropWeapon()
     {
         if (weapon != null)
         {
@@ -108,7 +108,7 @@ public class WeaponController : MonoBehaviour
                 Debug.LogWarning("Cannot drop default weapon!");
                 return;
             }
-            weapon.onDropWeapon();
+            weapon.OnDropWeapon();
             weapon = null;
         }
     }

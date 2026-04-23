@@ -31,6 +31,7 @@ public class Player : MonoBehaviour
 
     void Update()
     {
+        // Update the direction the player is looking according to the mouse
         direction = (Camera.main.ScreenToWorldPoint(Input.mousePosition) - transform.position + new Vector3(0, 0, 10)).normalized;
         
         /* Movement Code */
@@ -57,28 +58,27 @@ public class Player : MonoBehaviour
 
         /* Interaction Code */
         hitObject = GetInteractedObject();
-        setInteractedHighlight();
+        SetInteractedHighlight();
 
         if (Input.GetKeyDown(KeyCode.E) && hitObject != null)
         {
-            interact();
+            Interact();
         }
 
-        // Interaction debug ray
+        // Interaction debug ray (Remove for final game)
         Debug.DrawRay(transform.position, direction * interactRadius, Color.green);
     }
     
-    public bool isFlipped()
+    public bool IsFlipped()
     {
         return direction.x < 0;
     }
 
     private GameObject GetInteractedObject()
     {
+        // Get the closest interactable object in the direction the player is facing
         RaycastHit[] hits = Physics.RaycastAll(transform.position, direction, interactRadius);
-
         System.Array.Sort(hits, (a, b) => a.distance.CompareTo(b.distance));
-
         foreach (var hit in hits)
         {
             GameObject obj = hit.collider.gameObject;
@@ -104,28 +104,31 @@ public class Player : MonoBehaviour
         return null;
     }
 
-    private void setInteractedHighlight()
+    private void SetInteractedHighlight()
     {
         // If hit a different object (or nothing), remove previous highlight
         if (lastHitObject != hitObject)
         {
             if (lastHitObject != null)
             {
-                lastHitObject.GetComponent<Object>().resetHighlight();
+                lastHitObject.GetComponent<Object>().ResetHighlight();
             }
             if (hitObject != null){
-                hitObject.GetComponent<Object>().highlight();
+                hitObject.GetComponent<Object>().Highlight();
             }
             lastHitObject = hitObject;
         }
     }
 
-    private void interact()
+    private void Interact()
     {
+        if (hitObject == null) return;
+        // If the Object is a weapon, equip it
         if (hitObject.GetComponent<Weapon>() != null)
         {
             wc.EquipWeapon(hitObject.GetComponent<Weapon>());
         }
+
     }
 
     public void TakeDamage(int damage = 0)

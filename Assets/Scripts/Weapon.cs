@@ -36,7 +36,7 @@ public abstract class Weapon : MonoBehaviour
     }
 
     // Primary attack methods
-    public virtual void usePrimary()
+    public virtual void UsePrimary()
     {
         Debug.Log($"Used {weaponName} with {primaryDamage} damage at a rate of {primaryFireRate}");
     }
@@ -44,13 +44,13 @@ public abstract class Weapon : MonoBehaviour
     {
         if (primaryCooldown <= 0f)
         {
-            usePrimary();
+            UsePrimary();
             primaryCooldown = primaryFireRate;
         }
     }
 
     // Secondary attack methods
-    public virtual void useSecondary()
+    public virtual void UseSecondary()
     {
         Debug.Log($"Used {weaponName} with {secondaryDamage} damage at a rate of {secondaryFireRate}");
     }
@@ -58,12 +58,12 @@ public abstract class Weapon : MonoBehaviour
     {
         if (secondaryCooldown <= 0f)
         {
-            useSecondary();
+            UseSecondary();
             secondaryCooldown = secondaryFireRate;
         }
     }
 
-    public virtual void onDropWeapon()
+    public virtual void OnDropWeapon()
     {
         // Detach weapon from player
         transform.SetParent(null);
@@ -84,7 +84,7 @@ public abstract class Weapon : MonoBehaviour
         Debug.Log($"Dropped {weaponName}");
     }
 
-    public virtual void onEquip()
+    public virtual void OnEquip()
     {
         Rigidbody[] rigidbodies = GetComponentsInChildren<Rigidbody>(true);
         Collider[] colliders = GetComponentsInChildren<Collider>(true);
