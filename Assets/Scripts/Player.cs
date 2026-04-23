@@ -17,11 +17,13 @@ public class Player : MonoBehaviour
     public float acceleration = 200.0f;
     public float airAcceleration = 20.0f;
 
+    [Header("Dynamic Settings")]
+    public Vector3 direction = Vector3.zero;
+
     private Rigidbody rigid;
     private WeaponController wc;
     private GameObject hitObject = null;
     private GameObject lastHitObject = null;
-    private Vector3 direction = Vector3.zero;
 
     void Start()
     {
@@ -38,7 +40,7 @@ public class Player : MonoBehaviour
         // Move the player using AD keys
         float moveHorizontal = Input.GetAxisRaw("Horizontal");
         float targetSpeed = moveHorizontal * maxSpeed;
-        if (rigid.velocity.y == 0)
+        if (IsGrounded())
         {
             // If the player is on the ground, apply full acceleration
             float newSpeed = Mathf.MoveTowards(rigid.velocity.x, targetSpeed, acceleration * Time.deltaTime);
@@ -51,7 +53,7 @@ public class Player : MonoBehaviour
             rigid.velocity = new Vector3(newSpeed, rigid.velocity.y, 0);
         }
         // Jump only when the player is on the ground
-        if (Input.GetKeyDown(KeyCode.W) && rigid.velocity.y <= 0.01 && rigid.velocity.y >= -0.01)
+        if (Input.GetKeyDown(KeyCode.W) && IsGrounded())
         {
             rigid.AddForce(Vector3.up * speed, ForceMode.Impulse);
         }
@@ -67,6 +69,11 @@ public class Player : MonoBehaviour
 
         // Interaction debug ray (Remove for final game)
         Debug.DrawRay(transform.position, direction * interactRadius, Color.green);
+    }
+
+    public bool IsGrounded()
+    {
+        return rigid.velocity.y <= 0.01 && rigid.velocity.y >= -0.01;
     }
     
     public bool IsFlipped()
