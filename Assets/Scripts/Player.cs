@@ -24,11 +24,15 @@ public class Player : MonoBehaviour
     private WeaponController wc;
     private GameObject hitObject = null;
     private GameObject lastHitObject = null;
+    private Animator anim;
+    private SpriteRenderer sprite;
 
     void Start()
     {
         rigid = GetComponent<Rigidbody>();
         wc = GetComponent<WeaponController>();
+        anim = GetComponentInChildren<Animator>();
+        sprite = GetComponentInChildren<SpriteRenderer>();
     }
 
     void Update()
@@ -57,6 +61,9 @@ public class Player : MonoBehaviour
         {
             rigid.AddForce(Vector3.up * speed, ForceMode.Impulse);
         }
+
+        // Animate player
+        Animate();
 
         /* Interaction Code */
         hitObject = GetInteractedObject();
@@ -136,6 +143,36 @@ public class Player : MonoBehaviour
             wc.EquipWeapon(hitObject.GetComponent<Weapon>());
         }
 
+    }
+
+    public void Animate()
+    {
+        if (anim == null) return;
+        bool flipped = IsFlipped();
+        float horizontalDirection = Input.GetAxisRaw("Horizontal");
+        // Flip the player depending on where they are looking
+        sprite.flipX = flipped;
+
+        // Do ground based animations
+        if (IsGrounded())
+        {
+            anim.SetBool("isFlying", false);
+            anim.SetBool("isFalling", false);
+            anim.SetBool("isRunning", horizontalDirection != 0);
+        }
+        else
+        {
+            if (rigid.velocity.y > 0)
+            {
+                anim.SetBool("isFalling", false);
+                anim.SetBool("isFlying", true);
+            }
+            if (rigid.velocity.y < 0)
+            {
+                anim.SetBool("isFlying", false);
+                anim.SetBool("isFalling", true);
+            }
+        }
     }
 
     public void TakeDamage(int damage = 0)
