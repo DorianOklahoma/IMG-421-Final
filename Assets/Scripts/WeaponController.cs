@@ -14,6 +14,10 @@ public class WeaponController : MonoBehaviour
     void Start()
     {
         player = GetComponent<Player>();
+        if (defaultWeapon == null)
+        {
+            Debug.LogWarning("No default weapon assigned to player!");
+        }
     }
 
     void Update()
@@ -27,14 +31,6 @@ public class WeaponController : MonoBehaviour
                 Weapon newWeapon = Instantiate(defaultWeapon, transform.position, Quaternion.identity);
                 newWeapon.isDefaultWeapon = true;
                 EquipWeapon(newWeapon);
-             }
-             else if (defaultWeapon == null)
-             {
-                Debug.LogWarning("No default weapon assigned to player!");
-             }
-             else
-             {
-                Debug.LogWarning("Player already has a weapon equipped!");
              }
         } 
         else
