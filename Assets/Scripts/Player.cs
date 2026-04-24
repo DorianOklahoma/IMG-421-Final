@@ -17,27 +17,34 @@ public class Player : MonoBehaviour
     public float acceleration = 200.0f;
     public float airAcceleration = 20.0f;
 
+    [Header("Dynamic Settings")]
+    public Vector3 direction = Vector3.zero;
+
     private Rigidbody rigid;
     private WeaponController wc;
     private GameObject hitObject = null;
     private GameObject lastHitObject = null;
-    private Vector3 direction = Vector3.zero;
+    private Animator anim;
+    private SpriteRenderer sprite;
 
     void Start()
     {
         rigid = GetComponent<Rigidbody>();
         wc = GetComponent<WeaponController>();
+        anim = GetComponentInChildren<Animator>();
+        sprite = GetComponentInChildren<SpriteRenderer>();
     }
 
     void Update()
     {
+        // Update the direction the player is looking according to the mouse
         direction = (Camera.main.ScreenToWorldPoint(Input.mousePosition) - transform.position + new Vector3(0, 0, 10)).normalized;
         
         /* Movement Code */
         // Move the player using AD keys
         float moveHorizontal = Input.GetAxisRaw("Horizontal");
         float targetSpeed = moveHorizontal * maxSpeed;
-        if (rigid.velocity.y == 0)
+        if (IsGrounded())
         {
             // If the player is on the ground, apply full acceleration
             float newSpeed = Mathf.MoveTowards(rigid.velocity.x, targetSpeed, acceleration * Time.deltaTime);
@@ -50,35 +57,42 @@ public class Player : MonoBehaviour
             rigid.velocity = new Vector3(newSpeed, rigid.velocity.y, 0);
         }
         // Jump only when the player is on the ground
-        if (Input.GetKeyDown(KeyCode.W) && rigid.velocity.y <= 0.01 && rigid.velocity.y >= -0.01)
+        if (Input.GetKeyDown(KeyCode.W) && IsGrounded())
         {
             rigid.AddForce(Vector3.up * speed, ForceMode.Impulse);
         }
 
+        // Animate player
+        Animate();
+
         /* Interaction Code */
         hitObject = GetInteractedObject();
-        setInteractedHighlight();
+        SetInteractedHighlight();
 
         if (Input.GetKeyDown(KeyCode.E) && hitObject != null)
         {
-            interact();
+            Interact();
         }
 
-        // Interaction debug ray
+        // Interaction debug ray (Remove for final game)
         Debug.DrawRay(transform.position, direction * interactRadius, Color.green);
     }
+
+    public bool IsGrounded()
+    {
+        return rigid.velocity.y <= 0.01 && rigid.velocity.y >= -0.01;
+    }
     
-    public bool isFlipped()
+    public bool IsFlipped()
     {
         return direction.x < 0;
     }
 
     private GameObject GetInteractedObject()
     {
+        // Get the closest interactable object in the direction the player is facing
         RaycastHit[] hits = Physics.RaycastAll(transform.position, direction, interactRadius);
-
         System.Array.Sort(hits, (a, b) => a.distance.CompareTo(b.distance));
-
         foreach (var hit in hits)
         {
             GameObject obj = hit.collider.gameObject;
@@ -104,27 +118,60 @@ public class Player : MonoBehaviour
         return null;
     }
 
-    private void setInteractedHighlight()
+    private void SetInteractedHighlight()
     {
         // If hit a different object (or nothing), remove previous highlight
         if (lastHitObject != hitObject)
         {
             if (lastHitObject != null)
             {
-                lastHitObject.GetComponent<Object>().resetHighlight();
+                lastHitObject.GetComponent<Object>().ResetHighlight();
             }
             if (hitObject != null){
-                hitObject.GetComponent<Object>().highlight();
+                hitObject.GetComponent<Object>().Highlight();
             }
             lastHitObject = hitObject;
         }
     }
 
-    private void interact()
+    private void Interact()
     {
+        if (hitObject == null) return;
+        // If the Object is a weapon, equip it
         if (hitObject.GetComponent<Weapon>() != null)
         {
             wc.EquipWeapon(hitObject.GetComponent<Weapon>());
+        }
+
+    }
+
+    public void Animate()
+    {
+        if (anim == null) return;
+        bool flipped = IsFlipped();
+        float horizontalDirection = Input.GetAxisRaw("Horizontal");
+        // Flip the player depending on where they are looking
+        sprite.flipX = flipped;
+
+        // Do ground based animations
+        if (IsGrounded())
+        {
+            anim.SetBool("isFlying", false);
+            anim.SetBool("isFalling", false);
+            anim.SetBool("isRunning", horizontalDirection != 0);
+        }
+        else
+        {
+            if (rigid.velocity.y > 0)
+            {
+                anim.SetBool("isFalling", false);
+                anim.SetBool("isFlying", true);
+            }
+            if (rigid.velocity.y < 0)
+            {
+                anim.SetBool("isFlying", false);
+                anim.SetBool("isFalling", true);
+            }
         }
     }
 

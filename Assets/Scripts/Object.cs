@@ -7,11 +7,13 @@ public class Object : MonoBehaviour
     private Renderer[] renderers;
     void Start()
     {
+        // Get every visable thing in the tree from the parent to highlight
         renderers = GetComponentsInChildren<Renderer>();
     }
 
-    public void highlight()
+    public void Highlight()
     {
+        // Highlight every renderer
         foreach (Renderer rend in renderers)
         {
             rend.material.EnableKeyword("_EMISSION");
@@ -19,8 +21,9 @@ public class Object : MonoBehaviour
         }
     }
 
-    public void resetHighlight()
+    public void ResetHighlight()
     {
+        // Disable highlight on every renderer
         foreach (Renderer rend in renderers)
         {
             rend.material.SetColor("_EmissionColor", Color.black);
