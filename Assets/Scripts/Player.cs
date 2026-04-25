@@ -26,9 +26,13 @@ public class Player : Character
         base.Update();
 
         // Update the direction the player is looking according to the mouse
-        direction = (Camera.main.ScreenToWorldPoint(Input.mousePosition) - transform.position + new Vector3(0, 0, 10)).normalized;
-        
-        /* Movement Code */
+        Vector3 mousePos = Input.mousePosition;
+        mousePos.z = Mathf.Abs(Camera.main.transform.position.z - transform.position.z);
+
+        Vector3 worldMouse = Camera.main.ScreenToWorldPoint(mousePos);
+        direction = (worldMouse - transform.position).normalized;
+
+        // Movement code
         // Move the player using AD keys
         float moveHorizontal = Input.GetAxisRaw("Horizontal");
         float targetSpeed = moveHorizontal * maxSpeed;
@@ -53,7 +57,7 @@ public class Player : Character
         // Animate player
         Animate();
 
-        /* Interaction Code */
+        // Interaction Code
         hitObject = GetInteractedObject();
         SetInteractedHighlight();
 
