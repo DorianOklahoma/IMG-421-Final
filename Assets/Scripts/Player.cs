@@ -4,39 +4,27 @@ using Unity.VisualScripting;
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody))]
-public class Player : MonoBehaviour
+public class Player : Character
 {
     [Header("Player Settings")]
-    public int health = 100;
-    public float blockPercentage = 0f;
     public float interactRadius = 5f;
-
-    [Header("Movement Settings")]
-    public float speed = 5.0f;
-    public float maxSpeed = 5.0f;
-    public float acceleration = 200.0f;
-    public float airAcceleration = 20.0f;
 
     [Header("Dynamic Settings")]
     public Vector3 direction = Vector3.zero;
 
-    private Rigidbody rigid;
-    private WeaponController wc;
     private GameObject hitObject = null;
     private GameObject lastHitObject = null;
-    private Animator anim;
-    private SpriteRenderer sprite;
 
-    void Start()
+    protected override void Start()
     {
-        rigid = GetComponent<Rigidbody>();
-        wc = GetComponent<WeaponController>();
-        anim = GetComponentInChildren<Animator>();
-        sprite = GetComponentInChildren<SpriteRenderer>();
+        base.Start();
     }
 
-    void Update()
+    protected override void Update()
     {
+        // Do base function
+        base.Update();
+
         // Update the direction the player is looking according to the mouse
         direction = (Camera.main.ScreenToWorldPoint(Input.mousePosition) - transform.position + new Vector3(0, 0, 10)).normalized;
         
@@ -76,16 +64,6 @@ public class Player : MonoBehaviour
 
         // Interaction debug ray (Remove for final game)
         Debug.DrawRay(transform.position, direction * interactRadius, Color.green);
-    }
-
-    public bool IsGrounded()
-    {
-        return rigid.velocity.y <= 0.01 && rigid.velocity.y >= -0.01;
-    }
-    
-    public bool IsFlipped()
-    {
-        return direction.x < 0;
     }
 
     private GameObject GetInteractedObject()
@@ -145,39 +123,22 @@ public class Player : MonoBehaviour
 
     }
 
-    public void Animate()
-    {
-        if (anim == null) return;
-        bool flipped = IsFlipped();
-        float horizontalDirection = Input.GetAxisRaw("Horizontal");
-        // Flip the player depending on where they are looking
-        sprite.flipX = flipped;
-
-        // Do ground based animations
-        if (IsGrounded())
-        {
-            anim.SetBool("isFlying", false);
-            anim.SetBool("isFalling", false);
-            anim.SetBool("isRunning", horizontalDirection != 0);
-        }
-        else
-        {
-            if (rigid.velocity.y > 0)
-            {
-                anim.SetBool("isFalling", false);
-                anim.SetBool("isFlying", true);
-            }
-            if (rigid.velocity.y < 0)
-            {
-                anim.SetBool("isFlying", false);
-                anim.SetBool("isFalling", true);
-            }
-        }
-    }
-
     public void TakeDamage(int damage = 0)
     {
         float blockedDamage = damage * blockPercentage;
         health -= damage - (int)blockedDamage;
+    }
+
+    protected override void SetFacing()
+    {
+        if (direction.x < 0)
+            currentFacing = Facing.left;
+        else if (direction.x > 0)
+            currentFacing = Facing.right;
+    }
+
+    public override float GetHorizontalDirection()
+    {
+        return Input.GetAxisRaw("Horizontal");
     }
 }
