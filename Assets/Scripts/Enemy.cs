@@ -34,6 +34,7 @@ public abstract class Enemy : Character
             switch(currentState)
             {
                 case State.idle:
+                    IdleState();
                     if (distance < sightDistance)
                     {
                         currentState = State.chase;
@@ -61,6 +62,10 @@ public abstract class Enemy : Character
     }
 
     public abstract void ChaseTarget();
+    public virtual void IdleState()
+    {
+        rigid.velocity = Vector3.zero;
+    }
 
 
 }
