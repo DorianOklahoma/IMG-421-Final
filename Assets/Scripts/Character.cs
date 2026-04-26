@@ -7,7 +7,7 @@ public abstract class Character : MonoBehaviour
     
     [Header("Character Settings")]
     public string characterName;
-    public int health = 100;
+    public float health = 100;
     public float blockPercentage = 0f;
 
     [Header("Movement Settings")]
@@ -99,5 +99,11 @@ public abstract class Character : MonoBehaviour
                 anim.SetBool("isFalling", true);
             }
         }
+    }
+
+    public virtual void TakeDamage(float damage = 0)
+    {
+        damage *= 1 - blockPercentage;
+        health -= damage;
     }
 }

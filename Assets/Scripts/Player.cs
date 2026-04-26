@@ -127,12 +127,6 @@ public class Player : Character
 
     }
 
-    public void TakeDamage(int damage = 0)
-    {
-        float blockedDamage = damage * blockPercentage;
-        health -= damage - (int)blockedDamage;
-    }
-
     protected override void SetFacing()
     {
         if (direction.x < 0)
