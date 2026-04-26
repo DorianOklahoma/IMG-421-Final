@@ -9,6 +9,11 @@ public class Object : MonoBehaviour
     {
         // Get every visable thing in the tree from the parent to highlight
         renderers = GetComponentsInChildren<Renderer>();
+        Rigidbody rigid = GetComponentInChildren<Rigidbody>();
+        if (rigid != null)
+        {
+            rigid.constraints = RigidbodyConstraints.FreezePositionZ | RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationY;
+        }
     }
 
     public void Highlight()

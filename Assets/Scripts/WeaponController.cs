@@ -18,6 +18,10 @@ public class WeaponController : MonoBehaviour
         {
             Debug.LogWarning("No default weapon assigned to character!");
         }
+        if (weaponPoint == null)
+        {
+            weaponPoint = transform.Find("WeaponPoint").transform;
+        }
     }
 
     void Update()
