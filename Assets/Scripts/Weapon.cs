@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
 
 
 public abstract class Weapon : MonoBehaviour
@@ -12,6 +13,7 @@ public abstract class Weapon : MonoBehaviour
     public float primaryFireRate = 1.0f;
     public float secondaryFireRate = 1.0f;
     public bool isDefaultWeapon = false;
+    public Sprite weaponSprite;
 
     [Header("Dynamic Weapon Settings")]
     public float primaryCooldown = 0f;
@@ -69,7 +71,7 @@ public abstract class Weapon : MonoBehaviour
         transform.SetParent(null);
 
         Rigidbody[] rigidbodies = GetComponentsInChildren<Rigidbody>(true);
-        Collider[] colliders = GetComponentsInChildren<Collider>(true);
+        Collider[] colliders = GetComponentsInChildren<Collider>(true).Where(c => c.gameObject != gameObject).ToArray();
 
         foreach (Rigidbody rb in rigidbodies)
         {
@@ -87,7 +89,7 @@ public abstract class Weapon : MonoBehaviour
     public virtual void OnEquip()
     {
         Rigidbody[] rigidbodies = GetComponentsInChildren<Rigidbody>(true);
-        Collider[] colliders = GetComponentsInChildren<Collider>(true);
+        Collider[] colliders = GetComponentsInChildren<Collider>(true).Where(c => c.gameObject != gameObject).ToArray();
 
         foreach (Rigidbody rb in rigidbodies)
         {
