@@ -105,5 +105,18 @@ public abstract class Character : MonoBehaviour
     {
         damage *= 1 - blockPercentage;
         health -= damage;
+        if (health <= 0)
+        {
+            Die();
+        }
+    }
+
+    public virtual void Die()
+    {
+        if (wc != null)
+        {
+            wc.DropWeapon();
+        }
+        Destroy(this.gameObject);
     }
 }
