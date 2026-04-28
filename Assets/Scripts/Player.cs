@@ -22,6 +22,9 @@ public class Player : MonoBehaviour
     private Renderer[] lastHitRenderers;
     private Vector3 direction = Vector3.zero;
 
+    // added in knockback
+    private float knockbackForce = 5f;
+
     void Start()
     {
         rigid = GetComponent<Rigidbody>();
@@ -177,9 +180,18 @@ public class Player : MonoBehaviour
         return false;
     }
 
-    public void TakeDamage(int damage = 0)
+    // edited to inplement knockback
+    public void TakeDamage(int damage, Vector3 hitDirection)
     {
         float blockedDamage = damage * blockPercentage;
         health -= damage - (int)blockedDamage;
+        Debug.Log("Player took damage! -" + damage);
+
+        ApplyKnockback(hitDirection);
+    }
+
+    // apply knockback script
+    private void ApplyKnockback (Vector3 direction) {
+        rigid.AddForce(direction.normalized * knockbackForce, ForceMode.Impulse);
     }
 }
