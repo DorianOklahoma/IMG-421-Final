@@ -13,15 +13,18 @@ public abstract class Weapon : MonoBehaviour
     public float primaryFireRate = 1.0f;
     public float secondaryFireRate = 1.0f;
     public bool isDefaultWeapon = false;
-    public Sprite weaponSprite;
+    protected Animator anim;
+    protected SpriteRenderer sprite;
 
     [Header("Dynamic Weapon Settings")]
     public float primaryCooldown = 0f;
     public float secondaryCooldown = 0f;
 
 
-    void Start()
+    protected virtual void Start()
     {
+        anim = GetComponentInChildren<Animator>();
+        sprite = GetComponentInChildren<SpriteRenderer>();
     }
 
     void Update()
