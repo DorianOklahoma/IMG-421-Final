@@ -15,6 +15,9 @@ public class Player : Character
     private GameObject hitObject = null;
     private GameObject lastHitObject = null;
 
+    // added in knockback
+    private float knockbackForce = 5f;
+
     protected override void Start()
     {
         base.Start();
@@ -135,8 +138,53 @@ public class Player : Character
             currentFacing = Facing.right;
     }
 
+    // edited to inplement knockback
+    public void TakeDamage(int damage, Vector3 hitDirection)
+    {
+        float blockedDamage = damage * blockPercentage;
+        health -= damage - (int)blockedDamage;
+        Debug.Log("Player took damage! -" + damage);
+
+        ApplyKnockback(hitDirection);
+    }
+
+    // apply knockback script
+    private void ApplyKnockback (Vector3 direction) {
+        rigid.AddForce(direction.normalized * knockbackForce, ForceMode.Impulse);
+    }
+    
     public override float GetHorizontalDirection()
     {
         return Input.GetAxisRaw("Horizontal");
+    }
+
+    public override void Animate()
+    {
+        if (anim == null) return;
+        float horizontalDirection = GetHorizontalDirection();
+
+        switch(currentFacing)
+        {
+            case Facing.left:
+                sprite.flipX = true;
+                break;
+            case Facing.right:
+                sprite.flipX = false;
+                break;
+        }
+
+        if (IsGrounded())
+        {
+            anim.SetBool("isFlying", false);
+            anim.SetBool("isRunning", horizontalDirection != 0);
+            if (Input.GetKeyDown(KeyCode.W))
+            {
+                anim.SetTrigger("jump");
+            }
+        }
+        else
+        {
+            anim.SetBool("isFlying", true);
+        }
     }
 }
