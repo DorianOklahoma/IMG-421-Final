@@ -15,6 +15,9 @@ public class Player : Character
     private GameObject hitObject = null;
     private GameObject lastHitObject = null;
 
+    // added in knockback
+    private float knockbackForce = 5f;
+
     protected override void Start()
     {
         base.Start();
@@ -135,6 +138,21 @@ public class Player : Character
             currentFacing = Facing.right;
     }
 
+    // edited to inplement knockback
+    public void TakeDamage(int damage, Vector3 hitDirection)
+    {
+        float blockedDamage = damage * blockPercentage;
+        health -= damage - (int)blockedDamage;
+        Debug.Log("Player took damage! -" + damage);
+
+        ApplyKnockback(hitDirection);
+    }
+
+    // apply knockback script
+    private void ApplyKnockback (Vector3 direction) {
+        rigid.AddForce(direction.normalized * knockbackForce, ForceMode.Impulse);
+    }
+    
     public override float GetHorizontalDirection()
     {
         return Input.GetAxisRaw("Horizontal");
