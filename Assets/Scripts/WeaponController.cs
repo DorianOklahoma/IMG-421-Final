@@ -10,15 +10,23 @@ public class WeaponController : MonoBehaviour
     public Weapon defaultWeapon;
     public Transform weaponPoint;
     
-    private Player player;
+    private Character character;
     void Start()
     {
-        player = GetComponent<Player>();
+        character = GetComponent<Character>();
+        if (defaultWeapon == null)
+        {
+            Debug.LogWarning("No default weapon assigned to character!");
+        }
+        if (weaponPoint == null)
+        {
+            weaponPoint = transform.Find("WeaponPoint").transform;
+        }
     }
 
     void Update()
     {
-        // If the player doesn't have a weapon equipped, equip the default weapon
+        // If the character doesn't have a weapon equipped, equip the default weapon
         if (weapon == null)
         {
             // instantiate the default weapon and equip it
@@ -28,39 +36,34 @@ public class WeaponController : MonoBehaviour
                 newWeapon.isDefaultWeapon = true;
                 EquipWeapon(newWeapon);
              }
-             else if (defaultWeapon == null)
-             {
-                Debug.LogWarning("No default weapon assigned to player!");
-             }
-             else
-             {
-                Debug.LogWarning("Player already has a weapon equipped!");
-             }
+             return;
         } 
+
+            // Flip weapon if facing left
+        if (character.IsFlipped())
+        {
+            // Switch weaponPoint to other side
+            weaponPoint.localPosition = new Vector3(Mathf.Abs(weaponPoint.localPosition.x) * -1, weaponPoint.localPosition.y, 0);
+
+            // Rotate the point 180 degrees
+            weaponPoint.localRotation = new Quaternion(weapon.transform.localRotation.x, 180, weapon.transform.localRotation.z, weapon.transform.localRotation.w);
+        }
         else
         {
-            if (Input.GetKeyDown(KeyCode.Mouse0))
-            {
-                weapon.PrimaryAttack();
-            }
-            if (Input.GetKeyDown(KeyCode.Mouse1))
-            {
-                weapon.SecondaryAttack();
-            }
-            if (Input.GetKeyDown(KeyCode.Q))
-            {
-                dropWeapon();
-            }
+            // Switch position back
+            weaponPoint.localPosition = new Vector3(Mathf.Abs(weaponPoint.localPosition.x), weaponPoint.localPosition.y, 0);
+            // switch rotation back
+            weaponPoint.localRotation = new Quaternion(weapon.transform.localRotation.x, 0, weapon.transform.localRotation.z, weapon.transform.localRotation.w);
         }
 
-        // Flip weapon if facing left
-        if (player.isFlipped())
+        // if its a player use player scpecific controls
+        if (character is Player)
         {
-            weaponPoint.localPosition = new Vector3(Mathf.Abs(weaponPoint.localPosition.x) * -1, weaponPoint.localPosition.y, 0);
+            PlayerControls();
         }
-        else
+        else if (character is Enemy)
         {
-            weaponPoint.localPosition = new Vector3(Mathf.Abs(weaponPoint.localPosition.x), weaponPoint.localPosition.y, 0);
+            EnemyControls();
         }
     }
 
@@ -76,7 +79,7 @@ public class WeaponController : MonoBehaviour
             }
             else
             {
-                dropWeapon();
+                DropWeapon();
             }
         }
         // equip new weapon
@@ -85,10 +88,10 @@ public class WeaponController : MonoBehaviour
         weapon.transform.SetParent(weaponPoint);
         weapon.transform.localPosition = Vector3.zero;
         weapon.transform.localRotation = Quaternion.identity;
-        weapon.onEquip();
+        weapon.OnEquip();
     }
 
-    public void dropWeapon()
+    public void DropWeapon()
     {
         if (weapon != null)
         {
@@ -98,8 +101,28 @@ public class WeaponController : MonoBehaviour
                 Debug.LogWarning("Cannot drop default weapon!");
                 return;
             }
-            weapon.onDropWeapon();
+            weapon.OnDropWeapon();
             weapon = null;
         }
+    }
+    private void PlayerControls()
+    {
+        if (Input.GetKeyDown(KeyCode.Mouse0))
+        {
+            weapon.PrimaryAttack();
+        }
+        if (Input.GetKeyDown(KeyCode.Mouse1))
+        {
+            weapon.SecondaryAttack();
+        }
+        if (Input.GetKeyDown(KeyCode.Q))
+        {
+            DropWeapon();
+        }
+    }
+
+    private void EnemyControls()
+    {
+        return;
     }
 }

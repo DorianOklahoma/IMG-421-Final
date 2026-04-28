@@ -1,16 +1,19 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
 
 
 public abstract class Weapon : MonoBehaviour
 {
+    [Header("Static Weapon Settings")]
     public string weaponName = "Weapon Name";
     public float primaryDamage = 1.0f;
     public float secondaryDamage = 1.0f;
     public float primaryFireRate = 1.0f;
     public float secondaryFireRate = 1.0f;
     public bool isDefaultWeapon = false;
+    public Sprite weaponSprite;
 
     [Header("Dynamic Weapon Settings")]
     public float primaryCooldown = 0f;
@@ -35,7 +38,7 @@ public abstract class Weapon : MonoBehaviour
     }
 
     // Primary attack methods
-    public virtual void usePrimary()
+    public virtual void UsePrimary()
     {
         Debug.Log($"Used {weaponName} with {primaryDamage} damage at a rate of {primaryFireRate}");
     }
@@ -43,13 +46,13 @@ public abstract class Weapon : MonoBehaviour
     {
         if (primaryCooldown <= 0f)
         {
-            usePrimary();
+            UsePrimary();
             primaryCooldown = primaryFireRate;
         }
     }
 
     // Secondary attack methods
-    public virtual void useSecondary()
+    public virtual void UseSecondary()
     {
         Debug.Log($"Used {weaponName} with {secondaryDamage} damage at a rate of {secondaryFireRate}");
     }
@@ -57,18 +60,18 @@ public abstract class Weapon : MonoBehaviour
     {
         if (secondaryCooldown <= 0f)
         {
-            useSecondary();
+            UseSecondary();
             secondaryCooldown = secondaryFireRate;
         }
     }
 
-    public virtual void onDropWeapon()
+    public virtual void OnDropWeapon()
     {
         // Detach weapon from player
         transform.SetParent(null);
 
         Rigidbody[] rigidbodies = GetComponentsInChildren<Rigidbody>(true);
-        Collider[] colliders = GetComponentsInChildren<Collider>(true);
+        Collider[] colliders = GetComponentsInChildren<Collider>(true).Where(c => c.gameObject != gameObject).ToArray();
 
         foreach (Rigidbody rb in rigidbodies)
         {
@@ -83,10 +86,10 @@ public abstract class Weapon : MonoBehaviour
         Debug.Log($"Dropped {weaponName}");
     }
 
-    public virtual void onEquip()
+    public virtual void OnEquip()
     {
         Rigidbody[] rigidbodies = GetComponentsInChildren<Rigidbody>(true);
-        Collider[] colliders = GetComponentsInChildren<Collider>(true);
+        Collider[] colliders = GetComponentsInChildren<Collider>(true).Where(c => c.gameObject != gameObject).ToArray();
 
         foreach (Rigidbody rb in rigidbodies)
         {

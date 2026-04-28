@@ -1,45 +1,45 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody))]
-public class Player : MonoBehaviour
+public class Player : Character
 {
     [Header("Player Settings")]
-    public int health = 100;
-    public float blockPercentage = 0f;
     public float interactRadius = 5f;
 
-    [Header("Movement Settings")]
-    public float speed = 5.0f;
-    public float maxSpeed = 5.0f;
-    public float acceleration = 200.0f;
-    public float airAcceleration = 20.0f;
+    [Header("Dynamic Settings")]
+    public Vector3 direction = Vector3.zero;
 
-    private Rigidbody rigid;
-    private WeaponController wc;
     private GameObject hitObject = null;
-    private Renderer[] lastHitRenderers;
-    private Vector3 direction = Vector3.zero;
+    private GameObject lastHitObject = null;
 
     // added in knockback
     private float knockbackForce = 5f;
 
-    void Start()
+    protected override void Start()
     {
-        rigid = GetComponent<Rigidbody>();
-        wc = GetComponent<WeaponController>();
+        base.Start();
     }
 
-    void Update()
+    protected override void Update()
     {
-        direction = (Camera.main.ScreenToWorldPoint(Input.mousePosition) - transform.position + new Vector3(0, 0, 10)).normalized;
-        
-        /* Movement Code */
+        // Do base function
+        base.Update();
+
+        // Update the direction the player is looking according to the mouse
+        Vector3 mousePos = Input.mousePosition;
+        mousePos.z = Mathf.Abs(Camera.main.transform.position.z - transform.position.z);
+
+        Vector3 worldMouse = Camera.main.ScreenToWorldPoint(mousePos);
+        direction = (worldMouse - transform.position).normalized;
+
+        // Movement code
         // Move the player using AD keys
         float moveHorizontal = Input.GetAxisRaw("Horizontal");
         float targetSpeed = moveHorizontal * maxSpeed;
-        if (rigid.velocity.y == 0)
+        if (IsGrounded())
         {
             // If the player is on the ground, apply full acceleration
             float newSpeed = Mathf.MoveTowards(rigid.velocity.x, targetSpeed, acceleration * Time.deltaTime);
@@ -52,35 +52,40 @@ public class Player : MonoBehaviour
             rigid.velocity = new Vector3(newSpeed, rigid.velocity.y, 0);
         }
         // Jump only when the player is on the ground
-        if (Input.GetKeyDown(KeyCode.W) && rigid.velocity.y == 0)
+        if (Input.GetKeyDown(KeyCode.W) && IsGrounded())
         {
             rigid.AddForce(Vector3.up * speed, ForceMode.Impulse);
         }
 
-        /* Interaction Code */
-        highlightInteractable();
+        // Animate player
+        Animate();
+
+        // Interaction Code
+        hitObject = GetInteractedObject();
+        SetInteractedHighlight();
 
         if (Input.GetKeyDown(KeyCode.E) && hitObject != null)
         {
-            interact();
+            Interact();
         }
+
+        // Interaction debug ray (Remove for final game)
+        Debug.DrawRay(transform.position, direction * interactRadius, Color.green);
     }
 
     private GameObject GetInteractedObject()
     {
+        // Get the closest interactable object in the direction the player is facing
         RaycastHit[] hits = Physics.RaycastAll(transform.position, direction, interactRadius);
-
         System.Array.Sort(hits, (a, b) => a.distance.CompareTo(b.distance));
-
         foreach (var hit in hits)
         {
             GameObject obj = hit.collider.gameObject;
+            Object mainObject = obj.GetComponentInParent<Object>();
 
-            Weapon weapon = obj.GetComponentInParent<Weapon>();
-
-            if (weapon != null)
+            if (mainObject != null)
             {
-                obj = weapon.gameObject;
+                obj = mainObject.GameObject();
             }
 
             // Skip equipped weapon (including children)
@@ -91,93 +96,46 @@ public class Player : MonoBehaviour
             if (obj == gameObject)
                 continue;
 
-            if (isInteractable(obj))
+            if (obj.GetComponent<Object>() != null)
                 return obj;
         }
 
         return null;
     }
 
-    public bool isFlipped()
+    private void SetInteractedHighlight()
     {
-        return direction.x < 0;
+        // If hit a different object (or nothing), remove previous highlight
+        if (lastHitObject != hitObject)
+        {
+            if (lastHitObject != null)
+            {
+                lastHitObject.GetComponent<Object>().ResetHighlight();
+            }
+            if (hitObject != null){
+                hitObject.GetComponent<Object>().Highlight();
+            }
+            lastHitObject = hitObject;
+        }
     }
 
-    private void highlightInteractable()
+    private void Interact()
     {
-        hitObject = GetInteractedObject();
-
-        Renderer[] currentRenderers = null;
-
-        if (hitObject != null)
-        {
-            currentRenderers = hitObject.GetComponentsInChildren<Renderer>();
-        }
-
-        // If different object (or nothing), remove previous highlight
-        if (lastHitRenderers != currentRenderers)
-        {
-            if (lastHitRenderers != null)
-            {
-                foreach (Renderer rend in lastHitRenderers)
-                {
-                    if (rend != null)
-                    {
-                        rend.material.SetColor("_EmissionColor", Color.black);
-                    }
-                }
-            }
-
-            // Apply highlight to new object (all renderers)
-            if (hitObject != null && isInteractable(hitObject) && currentRenderers != null)
-            {
-                foreach (Renderer rend in currentRenderers)
-                {
-                    rend.material.EnableKeyword("_EMISSION");
-                    rend.material.SetColor("_EmissionColor", Color.yellow * 2f);
-                }
-            }
-
-            lastHitRenderers = currentRenderers;
-        }
-
-        // If nothing hit, clear highlight
-        if (currentRenderers == null && lastHitRenderers != null)
-        {
-            foreach (Renderer rend in lastHitRenderers)
-            {
-                if (rend != null)
-                {
-                    rend.material.SetColor("_EmissionColor", Color.black);
-                }
-            }
-
-            lastHitRenderers = null;
-        }
-
-        // Debug ray
-        Vector3 direction = (Camera.main.ScreenToWorldPoint(Input.mousePosition)
-                            - transform.position + new Vector3(0, 0, 10)).normalized;
-
-        Debug.DrawRay(transform.position, direction * interactRadius, Color.green);
-    }
-
-    private void interact()
-    {
+        if (hitObject == null) return;
+        // If the Object is a weapon, equip it
         if (hitObject.GetComponent<Weapon>() != null)
         {
             wc.EquipWeapon(hitObject.GetComponent<Weapon>());
         }
+
     }
 
-    private bool isInteractable(GameObject obj)
+    protected override void SetFacing()
     {
-        if (obj == null) return false;
-        if (obj.GetComponent<Weapon>() != null)
-        {
-            return true;
-        }
-        return false;
+        if (direction.x < 0)
+            currentFacing = Facing.left;
+        else if (direction.x > 0)
+            currentFacing = Facing.right;
     }
 
     // edited to inplement knockback
@@ -193,5 +151,10 @@ public class Player : MonoBehaviour
     // apply knockback script
     private void ApplyKnockback (Vector3 direction) {
         rigid.AddForce(direction.normalized * knockbackForce, ForceMode.Impulse);
+    }
+    
+    public override float GetHorizontalDirection()
+    {
+        return Input.GetAxisRaw("Horizontal");
     }
 }
