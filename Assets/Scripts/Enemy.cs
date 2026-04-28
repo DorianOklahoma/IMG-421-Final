@@ -29,24 +29,27 @@ public abstract class Enemy : Character
         base.Update();
         if (active)
         {
-            float distance = Vector3.Distance(target.transform.position, transform.position);
-
-            switch(currentState)
+            if (target != null)
             {
-                case State.idle:
-                    IdleState();
-                    if (distance < sightDistance)
-                    {
-                        currentState = State.chase;
-                    }
-                    break;
-                case State.chase:
-                    ChaseTarget();
-                    if (distance > sightDistance * 1.2f)
-                    {
-                        currentState = State.idle;
-                    }
-                    break;
+                float distance = Vector3.Distance(target.transform.position, transform.position);
+
+                switch(currentState)
+                {
+                    case State.idle:
+                        IdleState();
+                        if (distance < sightDistance)
+                        {
+                            currentState = State.chase;
+                        }
+                        break;
+                    case State.chase:
+                        ChaseTarget();
+                        if (distance > sightDistance * 1.2f)
+                        {
+                            currentState = State.idle;
+                        }
+                        break;
+                }
             }
         }
         
@@ -58,6 +61,10 @@ public abstract class Enemy : Character
         if (wc != null)
         {
             wc.weapon.PrimaryAttack();
+        }
+        if (anim != null)
+        {
+            anim.SetTrigger("attack");
         }
     }
 
