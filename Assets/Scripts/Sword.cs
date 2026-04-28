@@ -7,14 +7,19 @@ public class Sword : Weapon
 {
     public Collider hitCollider;
     private List<Enemy> enemies = new List<Enemy>();
-    void Start()
+    protected override void Start()
     {
+        base.Start();
         hitCollider = GetComponent<BoxCollider>();
     }
 
     public override void UsePrimary()
     {
         base.UsePrimary();
+        if (anim != null)
+        {
+            anim.SetTrigger("attack");
+        }
 
         foreach(Enemy enemy in enemies)
         {

@@ -36,6 +36,10 @@ public abstract class Character : MonoBehaviour
     protected virtual void Update()
     {
         SetFacing();
+        if (health < 0)
+        {
+            Die();
+        }
     }
 
     protected virtual void SetFacing()
@@ -109,6 +113,13 @@ public abstract class Character : MonoBehaviour
         {
             Die();
         }
+        else
+        {
+            if (anim != null)
+            {
+                anim.SetTrigger("takeDamage");
+            }
+        }
     }
 
     public virtual void Die()
@@ -117,6 +128,16 @@ public abstract class Character : MonoBehaviour
         {
             wc.DropWeapon();
         }
+        if (anim != null)
+        {
+            if (!anim.GetCurrentAnimatorStateInfo(0).IsName("death"))
+            anim.SetTrigger("death");
+        }
+        Invoke("Kill", 1);
+    }
+
+    public void Kill()
+    {
         Destroy(this.gameObject);
     }
 }

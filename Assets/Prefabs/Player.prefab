@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 4293172917151562299}
   - component: {fileID: 7786711657935279379}
   - component: {fileID: 4258903592392819698}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: SpriteAnimator
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -28,8 +28,8 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_LocalScale: {x: 4.2, y: 4.2, z: 4.2}
+  m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 8680712191365543079}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -74,15 +74,15 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 0}
+  m_Sprite: {fileID: 1631459830, guid: 8f4f79248b51e4ec9900276bf400b602, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 1, y: 1}
+  m_Size: {x: 0.32, y: 0.48}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 0
+  m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!95 &4258903592392819698
@@ -115,7 +115,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5608767997220203090}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: WeaponPoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -131,7 +131,7 @@ Transform:
   m_GameObject: {fileID: 5635393325831712946}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.77, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -149,7 +149,7 @@ GameObject:
   - component: {fileID: 2314520745105390650}
   - component: {fileID: 3378324633052352205}
   - component: {fileID: 2297732678346815192}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Capsule
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -186,7 +186,7 @@ MeshRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7539842258853103859}
-  m_Enabled: 1
+  m_Enabled: 0
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
@@ -256,7 +256,7 @@ GameObject:
   - component: {fileID: 2042545952456605491}
   - component: {fileID: 8465455422658354974}
   - component: {fileID: 4130129458852046114}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Player
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -320,13 +320,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f998d1dd06db8412787ca0ae0154c3c8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  characterName: 
   health: 100
   blockPercentage: 0
-  interactRadius: 2
   speed: 5
   maxSpeed: 5
   acceleration: 200
   airAcceleration: 20
+  interactRadius: 2
   direction: {x: 0, y: 0, z: 0}
 --- !u!114 &4130129458852046114
 MonoBehaviour:
@@ -341,5 +342,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   weapon: {fileID: 0}
-  defaultWeapon: {fileID: 2043117954634781165, guid: 9379ce7a97fe746648705b74e824c329, type: 3}
+  defaultWeapon: {fileID: 0}
   weaponPoint: {fileID: 5608767997220203090}
+  weaponPointRadius: 0.7
+  weaponPointDirection: {x: 1, y: 0, z: 0}

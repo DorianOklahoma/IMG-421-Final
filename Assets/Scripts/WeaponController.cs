@@ -9,7 +9,9 @@ public class WeaponController : MonoBehaviour
     public Weapon weapon;
     public Weapon defaultWeapon;
     public Transform weaponPoint;
-    
+    public float weaponPointRadius = 1f;
+    public Vector3 weaponPointDirection = new Vector3(0, 1, 0);
+
     private Character character;
     void Start()
     {
@@ -38,23 +40,7 @@ public class WeaponController : MonoBehaviour
              }
              return;
         } 
-
-            // Flip weapon if facing left
-        if (character.IsFlipped())
-        {
-            // Switch weaponPoint to other side
-            weaponPoint.localPosition = new Vector3(Mathf.Abs(weaponPoint.localPosition.x) * -1, weaponPoint.localPosition.y, 0);
-
-            // Rotate the point 180 degrees
-            weaponPoint.localRotation = new Quaternion(weapon.transform.localRotation.x, 180, weapon.transform.localRotation.z, weapon.transform.localRotation.w);
-        }
-        else
-        {
-            // Switch position back
-            weaponPoint.localPosition = new Vector3(Mathf.Abs(weaponPoint.localPosition.x), weaponPoint.localPosition.y, 0);
-            // switch rotation back
-            weaponPoint.localRotation = new Quaternion(weapon.transform.localRotation.x, 0, weapon.transform.localRotation.z, weapon.transform.localRotation.w);
-        }
+        LookTowards(weaponPointDirection);
 
         // if its a player use player scpecific controls
         if (character is Player)
@@ -86,7 +72,7 @@ public class WeaponController : MonoBehaviour
         weapon = newWeapon;
         // parent weapon to weapon point and reset local position and rotation
         weapon.transform.SetParent(weaponPoint);
-        weapon.transform.localPosition = Vector3.zero;
+        weapon.transform.localPosition = new Vector3(weaponPointRadius, 0, 0);
         weapon.transform.localRotation = Quaternion.identity;
         weapon.OnEquip();
     }
@@ -107,6 +93,7 @@ public class WeaponController : MonoBehaviour
     }
     private void PlayerControls()
     {
+        weaponPointDirection = character.GetComponent<Player>().direction;
         if (Input.GetKeyDown(KeyCode.Mouse0))
         {
             weapon.PrimaryAttack();
@@ -123,6 +110,24 @@ public class WeaponController : MonoBehaviour
 
     private void EnemyControls()
     {
+        weaponPointDirection = character.IsFlipped() ? new Vector3(-1, 0, 0) : new Vector3(1, 0, 0);
         return;
+    }
+
+    private void LookTowards(Vector3 dir)
+    {
+        dir = dir.normalized;
+
+        float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
+
+        // Flip logic
+        if (character.IsFlipped())
+        {
+            weaponPoint.localRotation = Quaternion.Euler(180f, 0f, 1-angle);
+        }
+        else
+        {
+            weaponPoint.localRotation = Quaternion.Euler(0, 0f, angle);
+        }
     }
 }
