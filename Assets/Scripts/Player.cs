@@ -157,4 +157,34 @@ public class Player : Character
     {
         return Input.GetAxisRaw("Horizontal");
     }
+
+    public override void Animate()
+    {
+        if (anim == null) return;
+        float horizontalDirection = GetHorizontalDirection();
+
+        switch(currentFacing)
+        {
+            case Facing.left:
+                sprite.flipX = true;
+                break;
+            case Facing.right:
+                sprite.flipX = false;
+                break;
+        }
+
+        if (IsGrounded())
+        {
+            anim.SetBool("isFlying", false);
+            anim.SetBool("isRunning", horizontalDirection != 0);
+            if (Input.GetKeyDown(KeyCode.W))
+            {
+                anim.SetTrigger("jump");
+            }
+        }
+        else
+        {
+            anim.SetBool("isFlying", true);
+        }
+    }
 }
