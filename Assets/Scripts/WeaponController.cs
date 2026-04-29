@@ -101,6 +101,11 @@ public class WeaponController : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Mouse1))
         {
             weapon.SecondaryAttack();
+
+            if (weapon is Bow bow)
+            {
+                bow.ReleaseSecondary();
+            }
         }
         if (Input.GetKeyDown(KeyCode.Q))
         {
