@@ -11,13 +11,23 @@ public class ArrowProjectile : MonoBehaviour
     private Rigidbody rigid;
     private bool hasHit = false;
 
-    void Start()
+    void Awake()
     {
         rigid = GetComponent<Rigidbody>();
+    }
 
+    void Start()
+    {
         rigid.constraints = RigidbodyConstraints.FreezeRotation | RigidbodyConstraints.FreezePositionZ;
         
         Destroy(gameObject, lifetime);
+    }
+
+    void Update()
+    {
+        Vector3 dir = rigid.velocity.normalized;
+        float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
+        rigid.rotation = Quaternion.Euler(0, 0f, angle);
     }
 
     public void Launch(Vector3 direction, float dmg)
