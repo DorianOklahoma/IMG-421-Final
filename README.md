@@ -45,10 +45,18 @@ Skies of Ember is a dungeon-crawling platformer. Players traverse interconnected
 | Jump | W |
 | Interact / Pick Up | E |
 | Primary Attack | Left Mouse Button |
-| Secondary Attack | Right Mouse Button |
+| Secondary Attack | Right Mouse Button (hold to draw bow) |
 | Drop Weapon | Q |
 
 The player aims with the mouse — the weapon rotates to follow the cursor direction in world space.
+
+---
+
+## Scenes
+
+**MainMenu** — The opening screen. Features a procedurally generated sunset sky with drifting clouds. Contains Play and Quit buttons wired to `MainMenu.cs`. Loads first in the build (index 0).
+
+**Level1** — The main gameplay scene.
 
 ---
 
@@ -56,11 +64,11 @@ The player aims with the mouse — the weapon rotates to follow the cursor direc
 
 All weapons extend the base `Weapon` class and share a cooldown system. Weapons are picked up from the world and dropped with Q. The default weapon is never dropped.
 
-**Fire Sword** — Melee. Primary slashes all enemies inside the hit collider.
+**Fire Sword** — Melee. Primary slashes all enemies inside the hit collider. Uses `SwordAnimator` controller with `idle` and `slash` states.
 
-**Fireball** — Ranged. Primary throws a fireball in the aim direction. Spawns a `FireballProjectile` that damages the first enemy it hits and plays an impact animation on contact.
+**Fireball** — Ranged. Primary throws a fireball in the aim direction. Spawns a `FireballProjectile` that damages the first enemy it hits and plays an impact animation on contact. Uses `FireballAnimator` controller with `hover`, `throw`, and `impact` states driven by triggers `throw` and `impact`.
 
-**Bow** — Ranged. Primary fires a quick arrow at base damage. Secondary hold-and-release draws the bow — the longer you hold, the more damage the arrow deals (up to 2.5× at full draw). Releasing too quickly cancels the shot.
+**Bow** — Ranged. Primary fires a quick arrow at base damage. Secondary hold-and-release draws the bow — the longer you hold (up to `maxDrawTime`), the more damage the arrow deals (up to 2.5× at full draw). Releasing too quickly cancels the shot. Uses `BowAnimator` controller with `idle`, `quickShot`, `drawing`, and `release` states driven by triggers `quickShot`, `draw`, `release`, `idle` and float `drawProgress`.
 
 **Fists** — The fallback unarmed weapon.
 
@@ -68,11 +76,11 @@ All weapons extend the base `Weapon` class and share a cooldown system. Weapons 
 
 ## Enemies
 
-**Shattered** — A grounded melee enemy. Chases the player and attacks at close range.
+**Shattered** — A grounded melee enemy. Chases the player and attacks at close range. Uses `ShatteredAnimator` controller.
 
-**Skywisp** — A flying enemy that drifts through the air toward the player.
+**Skywisp** — A flying enemy that drifts through the air toward the player. Uses `SkywispAnimator` controller.
 
-Both enemy types use an idle → chase state machine and extend the base `Enemy` class.
+Both enemy types use an idle → chase state machine and extend the base `Enemy` class. Enemies are on the **Objects** layer; projectiles are on the **Default** layer. The Physics Layer Collision Matrix must have Objects ↔ Default enabled for projectile damage to register.
 
 ---
 
@@ -123,6 +131,21 @@ Object             — base class for interactable world objects
 | `Trapdoor.cs` | Trapdoor mechanic. |
 | `TriggerArea.cs` | Generic trigger zone. |
 | `FollowCamera.cs` | Camera that follows the player. |
+| `MainMenu.cs` | Start/quit logic for the main menu scene. |
+| `CloudSpawner.cs` | Procedurally spawns and drifts clouds across the main menu background. |
+
+---
+
+## Animation Controllers
+
+| Controller | Used By | States |
+|---|---|---|
+| `PlayerAnimator` | Ember (Player) | idle, walk, jump, death, hit, special |
+| `ShatteredAnimator` | Shattered (Enemy) | idle, attack, death, dodge, hit |
+| `SkywispAnimator` | Skywisp (Enemy) | float, drift, attack, death, hit |
+| `SwordAnimator` | Fire Sword | idle, slash |
+| `FireballAnimator` | Fireball weapon + FireballProjectile | hover, throw, impact |
+| `BowAnimator` | Bow weapon | idle, quickShot, drawing, release |
 
 ---
 
@@ -132,7 +155,21 @@ Object             — base class for interactable world objects
 Assets/
 ├── Animations/
 │   ├── AnimationControllers/
+│   │   ├── PlayerAnimator.controller
+│   │   ├── ShatteredAnimator.controller
+│   │   ├── SkywispAnimator.controller
+│   │   ├── SwordAnimator.controller
+│   │   ├── FireballAnimator.controller
+│   │   └── BowAnimator.controller
 │   └── Animations/
+├── Prefabs/
+│   ├── Fireball.prefab
+│   ├── FireballProjectile.prefab
+│   ├── Bow.prefab
+│   └── ArrowProjectile.prefab
+├── Scenes/
+│   ├── MainMenu.unity
+│   └── Level1.unity
 ├── Scripts/
 │   ├── Character.cs
 │   ├── Player.cs
@@ -153,9 +190,9 @@ Assets/
 │   ├── HazardSpike.cs
 │   ├── Trapdoor.cs
 │   ├── TriggerArea.cs
-│   └── FollowCamera.cs
-├── Prefabs/
-├── Scenes/
+│   ├── FollowCamera.cs
+│   ├── MainMenu.cs
+│   └── CloudSpawner.cs
 └── ...
 ```
 
