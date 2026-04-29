@@ -14,6 +14,7 @@ public class Object : MonoBehaviour
         {
             rigid.constraints = RigidbodyConstraints.FreezePositionZ | RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationY;
         }
+
     }
 
     public void Highlight()
