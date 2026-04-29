@@ -8,6 +8,7 @@ public abstract class Enemy : Character
     [Header("Inscribed")]
     public float minDistance = .5f;
     public float sightDistance = 5f;
+    public float attackDistance = 4f;
 
     [Header("Dynamic")]
     public GameObject target;
@@ -17,7 +18,8 @@ public abstract class Enemy : Character
     // Enemy state variables
     private enum State{idle, chase};
     private State currentState;
-    // Movement variables
+    public float distance;
+    public Vector3 direction = new Vector3(1, 0, 0);
     protected override void Start()
     {
         base.Start();
@@ -31,7 +33,8 @@ public abstract class Enemy : Character
         {
             if (target != null)
             {
-                float distance = Vector3.Distance(target.transform.position, transform.position);
+                distance = Vector3.Distance(target.transform.position, transform.position);
+                direction = target.transform.position - transform.position;
 
                 switch(currentState)
                 {
@@ -44,6 +47,10 @@ public abstract class Enemy : Character
                         break;
                     case State.chase:
                         ChaseTarget();
+                        if (distance < attackDistance)
+                        {
+                            Attack();
+                        }
                         if (distance > sightDistance * 1.2f)
                         {
                             currentState = State.idle;
@@ -60,7 +67,7 @@ public abstract class Enemy : Character
     {
         if (wc != null)
         {
-            wc.weapon.PrimaryAttack();
+            wc.PrimaryAttack();
         }
         if (anim != null)
         {

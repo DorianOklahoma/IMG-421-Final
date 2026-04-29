@@ -13,13 +13,13 @@ public class FlyingEnemy : Enemy
     }
     public override void ChaseTarget()
     {
-        Vector3 targetPosition = target.transform.position + new Vector3(0, hoverDistance, 0);
-        float distanceToTarget = Vector3.Distance(rigid.transform.position, targetPosition);
-        Vector3 newVelocity = Vector3.zero;
+        Vector3 hoverTargetPosition = target.transform.position + new Vector3(0, hoverDistance, 0);
+        float distanceToHoverTarget = Vector3.Distance(rigid.transform.position, hoverTargetPosition);
+        Vector3 newVelocity;
 
-        if (distanceToTarget > minDistance)
+        if (distanceToHoverTarget > minDistance)
         {
-            Vector3 direction = (targetPosition - rigid.position).normalized;
+            Vector3 direction = (hoverTargetPosition - rigid.position).normalized;
             // Desired velocity toward the target
             Vector3 targetVelocity = direction * maxSpeed;
 

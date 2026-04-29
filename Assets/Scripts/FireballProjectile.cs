@@ -13,12 +13,15 @@ public class FireballProjectile : MonoBehaviour
     private Animator anim;
     private bool hasHit = false;
 
-    void Start()
+    void Awake()
     {
         rigid = GetComponent<Rigidbody>();
 
-        anim = GetComponentInChildren<Animator>();
+        anim = GetComponentInChildren<Animator>();        
+    }
 
+    void Start()
+    {
         rigid.constraints = RigidbodyConstraints.FreezeRotation | RigidbodyConstraints.FreezePositionZ;
         
         Destroy(gameObject, lifetime);
