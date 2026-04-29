@@ -23,6 +23,6 @@ public class Fireball : Weapon
 
         FireballProjectile projectile = Instantiate(fireballPrefab, launchPoint.position, Quaternion.identity);
         
-        projectile.Launch(launchPoint.right, primaryDamage, transform.root.gameObject);
+        projectile.Launch(launchPoint.right, primaryDamage);
     }
 }
