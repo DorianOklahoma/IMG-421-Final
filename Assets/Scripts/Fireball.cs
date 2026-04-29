@@ -16,13 +16,13 @@ public class Fireball : Weapon
     {
         base.UsePrimary();
         
-        if (anim != null)
+        if (anim != null) 
         {
             anim.SetTrigger("throw");
         }
 
         FireballProjectile projectile = Instantiate(fireballPrefab, launchPoint.position, Quaternion.identity);
         
-        projectile.Launch(launchPoint.right, primaryDamage);
+        projectile.Launch(launchPoint.right, primaryDamage, transform.root.gameObject);
     }
 }
