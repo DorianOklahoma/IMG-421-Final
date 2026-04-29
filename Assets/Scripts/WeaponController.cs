@@ -10,7 +10,7 @@ public class WeaponController : MonoBehaviour
     public Weapon defaultWeapon;
     public Transform weaponPoint;
     public float weaponPointRadius = 1f;
-    public Vector3 weaponPointDirection = new Vector3(0, 1, 0);
+    public Vector3 weaponPointDirection = new Vector3(1, 0, 0);
 
     private Character character;
     void Start()
@@ -96,16 +96,11 @@ public class WeaponController : MonoBehaviour
         weaponPointDirection = character.GetComponent<Player>().direction;
         if (Input.GetKeyDown(KeyCode.Mouse0))
         {
-            weapon.PrimaryAttack();
+            PrimaryAttack();
         }
         if (Input.GetKeyDown(KeyCode.Mouse1))
         {
-            weapon.SecondaryAttack();
-
-            if (weapon is Bow bow)
-            {
-                bow.ReleaseSecondary();
-            }
+            SecondaryAttack();
         }
         if (Input.GetKeyDown(KeyCode.Q))
         {
@@ -115,7 +110,8 @@ public class WeaponController : MonoBehaviour
 
     private void EnemyControls()
     {
-        weaponPointDirection = character.IsFlipped() ? new Vector3(-1, 0, 0) : new Vector3(1, 0, 0);
+        Enemy enemy = character.GetComponent<Enemy>();
+        weaponPointDirection = enemy.direction;
         return;
     }
 
@@ -133,6 +129,27 @@ public class WeaponController : MonoBehaviour
         else
         {
             weaponPoint.localRotation = Quaternion.Euler(0, 0f, angle);
+        }
+    }
+
+    public void PrimaryAttack()
+    {
+        if (weapon != null)
+        {
+            weapon.PrimaryAttack();
+        }
+    }
+
+    public void SecondaryAttack()
+    {
+        if (weapon != null)
+        {
+            weapon.SecondaryAttack();
+
+            if (weapon is Bow bow)
+            {
+                bow.ReleaseSecondary();
+            }
         }
     }
 }

@@ -27,7 +27,7 @@ public abstract class Weapon : MonoBehaviour
         sprite = GetComponentInChildren<SpriteRenderer>();
     }
 
-    void Update()
+    protected virtual void Update()
     {
         // Cooldown management
         if (primaryCooldown > 0f)

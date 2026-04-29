@@ -84,8 +84,9 @@ public class Bow : Weapon
         arrow.Launch(launchPoint.right, dmg);
     }
 
-    void Update()
+    protected override void Update()
     {
+        base.Update();
         if (anim != null && isDrawing)
         {
             anim.SetFloat("drawProgress", DrawProgress);
