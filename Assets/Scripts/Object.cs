@@ -35,4 +35,5 @@ public class Object : MonoBehaviour
             rend.material.SetColor("_EmissionColor", Color.black);
         }
     }
+    // god help us all
 }
